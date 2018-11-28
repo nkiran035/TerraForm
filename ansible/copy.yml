@@ -1,0 +1,11 @@
+---
+-
+  hosts: web
+  tasks:
+    - copy:
+        dest: /home/ec2-user/11.txt
+        group: ec2-user
+        mode: 420
+        owner: ec2-user
+        src: /home/ec2-user/1.txt
+      name: "example copying file with owner and permissions"
