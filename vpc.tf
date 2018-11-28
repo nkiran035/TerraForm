@@ -39,6 +39,22 @@ resource "aws_internet_gateway" "gw" {
   }
 }
 
+#Elastic IP
+resource "aws_eip" "nat" {
+  vpc      = true
+  depends_on = ["aws_internet_gateway.gw"]
+}
+
+#NAT gateway
+resource "aws_nat_gateway" "nat-gw" {
+  allocation_id = "${aws_eip.nat.id}"
+  subnet_id     = "${aws_subnet.public-subnet.id}"
+  
+  tags {
+    Name = "gw NAT"
+  }
+}
+
 # Define the route table
 resource "aws_route_table" "web-public-rt" {
   vpc_id = "${aws_vpc.default.id}"
@@ -53,10 +69,29 @@ resource "aws_route_table" "web-public-rt" {
   }
 }
 
+resource "aws_route_table" "web-private-rt" {
+  vpc_id = "${aws_vpc.default.id}"
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_nat_gateway.nat-gw.id}"
+  }
+
+  tags {
+    Name = "Private Subnet RT"
+  }
+}
+
 # Assign the route table to the public Subnet
 resource "aws_route_table_association" "web-public-rt" {
   subnet_id = "${aws_subnet.public-subnet.id}"
   route_table_id = "${aws_route_table.web-public-rt.id}"
+}
+
+# Assign the route table to the private Subnet
+resource "aws_route_table_association" "web-private-rt" {
+  subnet_id = "${aws_subnet.private-subnet.id}"
+  route_table_id = "${aws_route_table.web-private-rt.id}"
 }
 
 # Define the security group for public subnet
@@ -131,7 +166,14 @@ resource "aws_security_group" "sgdb"{
     protocol = "tcp"
     cidr_blocks = ["${var.public_subnet_cidr}"]
   }
-
+  
+    egress {
+  from_port   = 0
+  to_port     = 0
+  protocol    = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
+}
+  
   vpc_id = "${aws_vpc.default.id}"
 
   tags {
