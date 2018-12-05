@@ -1,0 +1,10 @@
+server
+    {
+        listen      8010;
+        server_name 18.144.62.118;
+    
+       location /
+        {
+            proxy_pass  http://172.20.20.222:8080;
+        }
+    }

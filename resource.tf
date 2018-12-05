@@ -29,7 +29,7 @@ resource "aws_instance" "db" {
    vpc_security_group_ids = ["${aws_security_group.sgdb.id}"]
    source_dest_check = false
    user_data = "${file("installTomcat.sh")}"
-
+	depends_on =["aws_nat_gateway.nat-gw"]
   tags {
     Name = "webserver"
   }

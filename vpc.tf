@@ -100,6 +100,20 @@ resource "aws_security_group" "sgweb" {
   description = "Allow incoming HTTP connections & SSH access"
 
   ingress {
+    from_port = 8080
+    to_port = 8080
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+    ingress {
+    from_port = 8010
+    to_port = 8010
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+  ingress {
     from_port = 80
     to_port = 80
     protocol = "tcp"
@@ -147,8 +161,8 @@ resource "aws_security_group" "sgdb"{
   description = "Allow traffic from public subnet"
 
   ingress {
-    from_port = 3306
-    to_port = 3306
+    from_port = 8080
+    to_port = 8080
     protocol = "tcp"
     cidr_blocks = ["${var.public_subnet_cidr}"]
   }
