@@ -2,6 +2,7 @@
 
 
 echo "Installing Jenkins"
+echo "Installing Jenkins Kiran"
 sudo yum remove java -y
 sudo yum install java-1.8.0-openjdk-devel -y 
 sudo wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
